@@ -1,60 +1,45 @@
-//输入很多行单词，统计每个单词的数量并以此排序，出现次数一样多时，按照字典序排列。
+//输入一系列单词，根据出现频率输出单词，当频率一致时，按字典序输出
 #include<iostream>
-#include<algorithm>
 #include<map>
-#include<cstring>
+#include<set>
 using namespace std;
 
-struct StudentInfo{
-    int StuId;
-    string name;
-};
-struct student{
-    int score;
-    StudentInfo studentinfo;
+typedef map<string, int> MP;
+
+struct word{
+    string word;
+    int count;
 };
 
+struct rule{
+    bool operator ()(const word &s1, const word &s2)const{
+        if(s1.count != s2.count){
+            return s1.count > s2.count;
+        }
+        else
+            return s1.word < s2.word;
+    }
+};
+typedef set<word,rule> ST;
 
-typedef multimap<int, StudentInfo> Stu;
 int main(){
-    Stu stu;
-    char c[20];
-    while(cin >> c){
-        if(c[0] == 'A') {
-            int score;
-            StudentInfo studentinfo;
-            cin >> studentinfo.name >> studentinfo.StuId >> score;
-            stu.insert(make_pair(score,studentinfo));
-        }
-        if(c[0] == 'Q'){
-            int score;
-            cin >> score;
-            Stu::iterator p = stu.lower_bound(score);
-            if(p != stu.begin()){
-                p--;
-                int max_score = p->first;
-                int max_Id = p->second.StuId;
-                string name = p->second.name;
-                for(; p != stu.begin() && p->first == max_score ;p--){
-                    if(max_Id < p->second.StuId){
-                        max_Id = p->second.StuId;
-                        name = p->second.name;
-                    }
-                }
-                if(p == stu.begin()){
-                    if(max_Id < p->second.StuId){
-                        max_Id = p->second.StuId;
-                        name = p->second.name;
-                    }
-                }
-                cout<< name << " " << max_Id << " " << max_score << endl;
-            }
-            else
-                cout<< "Nobody"<<endl;
+    MP mp;
+    string s;
+    while(cin >> s){
+        if(s == "end")
+            break;
+        mp[s]++;
+    }
+    ST st;
+    for(MP::iterator mpp = mp.begin(); mpp != mp.end(); mpp++){
+        word temp;
+        temp.word = mpp->first;
+        temp.count = mpp->second;
+        st.insert(temp);
+    }
 
-        }
-
-
+    for(ST::iterator stp = st.begin(); stp != st.end(); stp++){
+        cout << stp->word << " " << stp->count << endl;
     }
 
     return 0;
